@@ -1,5 +1,5 @@
 {
-  "name": "actbot",
+  "name": "discord-actbot",
   "version": "0.1.0",
   "description": "Discord bot to link to ACT",
   "main": "index.js",

@@ -26,8 +26,7 @@ let parseFlag = false;
 
 client.on('message', message => {
 	//Print message to log
-	console.log(message.author.username+": "+message.content);
-	console.log(`${prefix}auth ${auth_password}`);
+	//console.log(message.author.username+": "+message.content);
 	
 	//Check for DM auth request
 	if ((message.channel.type === "dm")&&(message.content === `${prefix}auth ${auth_password}`)){
@@ -44,16 +43,17 @@ client.on('message', message => {
 			act_guid_arr.push(newuuid);
 		}
 		
+	}else {
+		console.log(message.channel.type);
 	}
 	
-	//Check for allowed userid
 	if (allowed_userid_arr.includes(message.author.id)){
+		//Check for allowed userid
 		//console.log('auth user');
 		//Message author is authorized
 		if (message.content === `${prefix}ping`){
 			//send back pong in the channel the message was sent
 			message.channel.send('Pong');
-			console.log(message.channel.type); //text or dm
 		}else if (message.content === `${prefix}user-info`){
 			message.channel.send(`Your username: ${message.author.username}\nYour ID: ${message.author.id}`);
 			console.log(message.author.id);

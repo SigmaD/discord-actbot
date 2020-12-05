@@ -8,18 +8,18 @@ using System.Windows.Forms;
 using System.Net;
 using System.Text;
 using System.IO;
-using System.Threading;
+using System.Timers;
 // ACT will parse these assembly attributes to show plugin info in the same way it would if it were a DLL
 [assembly: AssemblyTitle("Discord Bot Script")]
 [assembly: AssemblyDescription("Sends current parse data to discord bot every 3 seconds")]
-[assembly: AssemblyVersion("0.0.0.3")]
+[assembly: AssemblyVersion("0.0.0.5")]
 
 namespace Some_ACT_Plugin
 {
     public class Clipboard_Sharer_Plugin : IActPluginV1 // To be loaded by ACT, plugins must implement this interface
     {
         Label statusLabel;	// Handle for the status label passed by InitPlugin()
-        System.Windows.Forms.Timer tmr = new System.Windows.Forms.Timer();
+        System.Timers.Timer tmr = new System.Timers.Timer();
 
         public void InitPlugin(TabPage pluginScreenSpace, Label pluginStatusText)
         {
@@ -28,10 +28,11 @@ namespace Some_ACT_Plugin
             Label lbl = new Label();
             lbl.Location = new System.Drawing.Point(8, 8);
             lbl.AutoSize = true;
-            lbl.Text = "Updating the clipboard every second.";
+            lbl.Text = "Updating the clipboard every 3 seconds.";
             pluginScreenSpace.Controls.Add(lbl);
             tmr.Interval = 3000;
-            tmr.Tick += tmr_Tick;
+			tmr.Elapsed += new ElapsedEventHandler(tmr_Tick);
+			tmr.Start();
             tmr.Enabled = true;
         }
 
@@ -43,11 +44,9 @@ namespace Some_ACT_Plugin
 			var logdata = ActGlobals.oFormActMain.GetTextExport(ActGlobals.oFormActMain.ActiveZone.ActiveEncounter, tfoCustom);
 
 			//Check logdata isn't empty - return if so
-			/*
 			if (logdata == ""){
 				return;
 			}
-			*/
 			
 			var request = (HttpWebRequest)WebRequest.Create("http://localhost:3000");
 
@@ -60,7 +59,7 @@ namespace Some_ACT_Plugin
 			request.ContentLength = data.Length;
 			request.ReadWriteTimeout = 500;
 			
-			//Make request to server
+			//Make the request
             try
             {
 				using (var stream = request.GetRequestStream())
@@ -68,38 +67,23 @@ namespace Some_ACT_Plugin
 					stream.Write(data, 0, data.Length);
 				}
 				
-				// Start the asynchronous operation to get the response
-				request.BeginGetResponse(new AsyncCallback(GetResponseCallback), request);
+				var response = (HttpWebResponse)request.GetResponse();
+
+				var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+				
+				statusLabel.Text = responseString;
+				
             }
             catch
             {
 				statusLabel.Text = "not connected";
             }
         }
-		
-		void GetResponseCallback(IAsyncResult asynchronousResult)
-		{
-			HttpWebRequest request = (HttpWebRequest)asynchronousResult.AsyncState;
-
-			// End the operation
-			HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asynchronousResult);
-			Stream streamResponse = response.GetResponseStream();
-			StreamReader streamRead = new StreamReader(streamResponse);
-			string responseString = streamRead.ReadToEnd();
-			//Add response string to statusLabel display
-			statusLabel.Text = responseString;
-			// Close the stream object
-			streamResponse.Close();
-			streamRead.Close();
-
-			// Release the HttpWebResponse
-			response.Close();
-		}
 
         public void DeInitPlugin()  // You must unsubscribe to any events you use
         {
             tmr.Enabled = false;
-            tmr.Tick -= tmr_Tick;
+			tmr.Stop();
             statusLabel.Text = "Plugin exited";
         }
     }

@@ -10,7 +10,10 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //Load config options
-const { prefix, token, allowed_userid_arr, act_guid, express_port } = require('./config.json');
+const { prefix, token, allowed_userid_arr, act_guid_arr, express_port, auth_password } = require('./config.json');
+
+//UUID generation
+const { v4: uuidv4 } = require('uuid');
 
 //When the discord client is ready, run this code
 client.once('ready', () => {
@@ -23,7 +26,25 @@ let parseFlag = false;
 
 client.on('message', message => {
 	//Print message to log
-	//console.log(message.author.username+": "+message.content);
+	console.log(message.author.username+": "+message.content);
+	console.log(`${prefix}auth ${auth_password}`);
+	
+	//Check for DM auth request
+	if ((message.channel.type === "dm")&&(message.content === `${prefix}auth ${auth_password}`)){
+		//Fail if user already exists
+		if (allowed_userid_arr.includes(message.author.id)){
+			message.channel.send('User already registered.');
+		}else {
+			let newuuid = uuidv4();
+			//Send user info
+			message.channel.send(`Your Discord username: ${message.author.username}\nYour Discord ID: ${message.author.id}\nRegistration complete. ACT key: ${newuuid}`);
+			//Added user to allowed array (TODO: update users file)
+			allowed_userid_arr.push(message.author.id);
+			//add uuid to act array
+			act_guid_arr.push(newuuid);
+		}
+		
+	}
 	
 	//Check for allowed userid
 	if (allowed_userid_arr.includes(message.author.id)){
@@ -32,6 +53,7 @@ client.on('message', message => {
 		if (message.content === `${prefix}ping`){
 			//send back pong in the channel the message was sent
 			message.channel.send('Pong');
+			console.log(message.channel.type); //text or dm
 		}else if (message.content === `${prefix}user-info`){
 			message.channel.send(`Your username: ${message.author.username}\nYour ID: ${message.author.id}`);
 			console.log(message.author.id);
@@ -55,7 +77,7 @@ client.login(token);
 //Express app functionality
 app.post('/', (req, res) => {
 	//console.log("Received a POST call");
-	if (req.body.guid == act_guid){
+	if (act_guid_arr.includes(req.body.guid)){
 		//Check if parsing
 		if (parseFlag){
 			//Received a valid ACT POST call

@@ -3,5 +3,6 @@
 	"express_port": 3000,
 	"token": "",
 	"allowed_userid_arr": [],
-	"act_guid": ""
+	"act_guid_arr": [],
+	"auth_password": ""
 }

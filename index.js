@@ -24,7 +24,7 @@ client.once('ready', () => {
 });
 
 //vars for persistent message tracking for parse
-let msg;
+let msgObj = {};
 let parseFlag = false;
 
 client.on('message', message => {
@@ -65,13 +65,13 @@ client.on('message', message => {
 		}else if (message.content === `${prefix}parse`){
 			message.channel.send('Ready').then(sentMessage => {
 				console.log('Starting parsing');
-				msg = sentMessage;
+				msgObj[message.author.id] = sentMessage;
 				parseFlag = true;
 			});
 		}else if (message.content === `${prefix}endparse`){
 			console.log('Stopping parsing');
 			parseFlag = false;
-			delete msg;
+			delete msgObj[message.author.id];
 		}
 	}
 });
@@ -98,7 +98,8 @@ app.post('/', (req, res) => {
 			//Received a valid ACT POST call
 			//Check discord output has content
 			if (req.body.log !== ""){
-				msg.edit(req.body.log);
+				//Lookup user by guid from ACT
+				msgObj[allowed_userid_arr[act_guid_arr.indexOf(req.body.guid)]].edit(req.body.log);
 				console.log(req.body);
 				res.send('connected: parsing to discord');
 			}else {

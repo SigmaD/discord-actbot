@@ -9,6 +9,7 @@ Usage
 ### Using an existing Discord Bot ###
 
 If you're using an existing bot, you need the following from the bot owner/maintainer/admin:
+
 	* Bot server address
 	* Authentication password
 
@@ -27,6 +28,7 @@ Registration complete. ACT key: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 This ACT key will be required by the plugin.
 
 Now you can install the plugin from this repo to ACT. (ACTBOT_plugin.cs)
+
 Once this has been installed, there should be a new tab in the plugin section titled ACTBOT_plugin.cs.
 Under this heading add the Bot server address (from the admin) and the ACT key (from the Bot's DM).
 
@@ -34,7 +36,7 @@ The final step is to change ACT to use your character name instead of 'YOU':
 This setting can be found in Options Tab>Data Correction>Miscellaneous>Default character name if not defined...
 Click Apply.
 
-If everything has worked, you should now be able to use the (hopefully self-explanatory)commands:
+If everything has worked, you should now be able to use the (hopefully self-explanatory) commands:
 ~~~
 !parse
 ~~~

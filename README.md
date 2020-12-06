@@ -10,8 +10,8 @@ Usage
 
 If you're using an existing bot, you need the following from the bot owner/maintainer/admin:
 
-	* Bot server address
-	* Authentication password
+  * Bot server address
+  * Authentication password
 
 Now DM the bot on discord with the authentication password in the form:
 ~~~

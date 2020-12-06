@@ -1,3 +1,5 @@
+//Main JS file for Discord ACT Bot
+
 //require the discord.js module
 const Discord = require('discord.js');
 //Create a new discord client
@@ -28,7 +30,7 @@ let msgObj = {};
 let parseFlag = false;
 
 client.on('message', message => {
-	//Print message to log
+	//Print message to log (You could uncomment this line if you want full logs)
 	//console.log(message.author.username+": "+message.content);
 	
 	//Check for DM auth request
@@ -47,21 +49,19 @@ client.on('message', message => {
 			//update users file
 			updateUsers();
 		}
-		
-	}else {
-		console.log(message.channel.type);
 	}
 	
 	if (allowed_userid_arr.includes(message.author.id)){
 		//Check for allowed userid
-		//console.log('auth user');
+		
 		//Message author is authorized
 		if (message.content === `${prefix}ping`){
 			//send back pong in the channel the message was sent
 			message.channel.send('Pong');
+		/*
 		}else if (message.content === `${prefix}user-info`){
 			message.channel.send(`Your username: ${message.author.username}\nYour ID: ${message.author.id}`);
-			console.log(message.author.id);
+		*/
 		}else if (message.content === `${prefix}parse`){
 			message.channel.send('Ready').then(sentMessage => {
 				console.log('Starting parsing');
@@ -70,8 +70,11 @@ client.on('message', message => {
 			});
 		}else if (message.content === `${prefix}endparse`){
 			console.log('Stopping parsing');
-			parseFlag = false;
 			delete msgObj[message.author.id];
+			//Check there are no ongoing parses - this should be done better probably
+			if (Object.keys(msgObj).length === 0 && msgObj.constructor === Object){
+				parseFlag = false;
+			}
 		}
 	}
 });
@@ -91,7 +94,7 @@ client.login(token);
 
 //Express app functionality
 app.post('/', (req, res) => {
-	//console.log("Received a POST call");
+	//Received a POST call;
 	if (act_guid_arr.includes(req.body.guid)){
 		//Check if parsing
 		if (parseFlag){

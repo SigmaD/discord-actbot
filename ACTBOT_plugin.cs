@@ -13,11 +13,11 @@ using System.Xml;
 // ACT will parse these assembly attributes to show plugin info in the same way it would if it were a DLL
 [assembly: AssemblyTitle("Discord Bot Script")]
 [assembly: AssemblyDescription("Sends current parse data to discord bot every 3 seconds")]
-[assembly: AssemblyVersion("0.0.0.6")]
+[assembly: AssemblyVersion("1.0.0.0")]
 
 namespace Some_ACT_Plugin
 {
-    public class Clipboard_Sharer_Plugin : IActPluginV1 // To be loaded by ACT, plugins must implement this interface
+    public class Discord_bot_Plugin : IActPluginV1 // To be loaded by ACT, plugins must implement this interface
     {
         Label statusLabel;	// Handle for the status label passed by InitPlugin()
 		string settingsFile = Path.Combine(ActGlobals.oFormActMain.AppDataFolder.FullName, "Config\\DISCORDACTBOT.config.xml");

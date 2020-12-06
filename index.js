@@ -10,10 +10,13 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //Load config options
-const { prefix, token, allowed_userid_arr, act_guid_arr, express_port, auth_password } = require('./config.json');
+const { prefix, token, express_port, auth_password } = require('./config.json');
+//Load User data
+const { allowed_userid_arr, act_guid_arr } = require('./userdata.json');
 
 //UUID generation
 const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
 
 //When the discord client is ready, run this code
 client.once('ready', () => {
@@ -37,10 +40,12 @@ client.on('message', message => {
 			let newuuid = uuidv4();
 			//Send user info
 			message.channel.send(`Your Discord username: ${message.author.username}\nYour Discord ID: ${message.author.id}\nRegistration complete. ACT key: ${newuuid}`);
-			//Added user to allowed array (TODO: update users file)
+			//Added user to allowed array
 			allowed_userid_arr.push(message.author.id);
 			//add uuid to act array
 			act_guid_arr.push(newuuid);
+			//update users file
+			updateUsers();
 		}
 		
 	}else {
@@ -70,6 +75,16 @@ client.on('message', message => {
 		}
 	}
 });
+
+function updateUsers(){
+	//Update the userdata file
+	let newdata = {
+		'allowed_userid_arr': allowed_userid_arr, 
+		'act_guid_arr': act_guid_arr
+	};
+	let newdatastring = JSON.stringify(newdata);
+	fs.writeFileSync('userdata.json', newdatastring);
+}
 
 //Login to discord with the app token
 client.login(token);
